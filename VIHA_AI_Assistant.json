@@ -1,0 +1,114 @@
+{
+  "name": "VIHA_AI_Assistant",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "010630ee-7fe4-44e5-88ba-a10b8c545d38",
+      "name": "When chat message received",
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "cce7a9c8-dcf9-4d23-b161-977643da93d2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openRouterApi",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=\n{\n  \"model\": \"openai/gpt-6-luna\",\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are VIHA, a human-like AI assistant helping users with jobs, AI learning, resumes and motivation. Answer naturally with detailed explanations and examples.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": {{ JSON.stringify($json.chatInput) }}\n    }\n  ],\n  \"temperature\": 0.8,\n  \"max_tokens\": 1000\n}\n",
+        "options": {}
+      },
+      "id": "41a5d47d-6719-4f97-bb87-00ac16ddb38b",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        224,
+        0
+      ],
+      "credentials": {
+        "openRouterApi": {
+          "id": "foX1ndNfBDJeEZXn",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "74269a7c-10c7-4aa3-88a5-a3023cd86e9b",
+              "name": "text",
+              "value": "={{ $json.choices[0].message.content }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "7a6dfd30-ca20-465b-9ebd-1d736f19bf44",
+      "name": "Edit Fields",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        448,
+        0
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "67666c04-d55b-412d-a53d-14faa43decb0",
+  "meta": {
+    "instanceId": "ca516062a083f4065fb9e9688fad66a5361d8cc542a6d2d965855ed576be3cc5"
+  },
+  "nodeGroups": [],
+  "id": "GOSY0nTzI5qCxxJx",
+  "tags": []
+}
